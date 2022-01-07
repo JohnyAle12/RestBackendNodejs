@@ -20,13 +20,13 @@ const userGet = async(req, res = response) => {
         // Este bloque me permite ejecutar varias promesas simultaneamente, y obtener sus resultados
         // desestructurando el array de resultados que devuelve, en el caso anterior tarda mas la petición
         const [ total, users] = await Promise.all([
-            await User.countDocuments(query),
+            User.countDocuments(query),
             User.find(query)
                 .skip(since)
                 .limit(limit)
         ]);
 
-        res.json({
+        return res.json({
             msg: 'List of users',
             total,
             users
