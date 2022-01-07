@@ -1,27 +1,76 @@
 const { response } = require('express');
+const bcryptjs = require('bcryptjs');
 
-const userGet = (req, res = response) => {
-    const params = req.query;
-    res.json({
-        msg: 'Hello World GET method FROM  COntroler',
-        params
+const User = require('../models/user');
+
+const userGet = async(req, res = response) => {
+    let { limit = 5, since = 0 } = req.query;
+    const query = { state:true };
+    
+    limit = Number(limit);
+    since = Number(since);
+
+    if(Number.isInteger(limit) && Number.isInteger(since)) {
+        // const users = await User.find(query)
+        //     .skip(since)
+        //     .limit(limit);
+        
+        // const total = await User.countDocuments(query);
+
+        // Este bloque me permite ejecutar varias promesas simultaneamente, y obtener sus resultados
+        // desestructurando el array de resultados que devuelve, en el caso anterior tarda mas la petición
+        const [ total, users] = await Promise.all([
+            await User.countDocuments(query),
+            User.find(query)
+                .skip(since)
+                .limit(limit)
+        ]);
+
+        res.json({
+            msg: 'List of users',
+            total,
+            users
+        });
+    }
+
+    res.status(400).json({
+        msg: 'El valor del paginador y del limite deben ser numeros',
     });
 }
 
-const userPost = (req, res = response) => {
-    const { name, age } = req.body;
+const userPost = async(req, res = response) => {
+
+    const { name, email, password, role } = req.body;
+    const user = new User({ name, email, password, role });
+
+    //Encriptar contraseña
+    const salt = bcryptjs.genSaltSync();
+    user.password = bcryptjs.hashSync(password, salt);
+
+    //Guarda el documento
+    await user.save();
+
     res.json({
-        msg: 'Hello World POST method FROM  COntroler',
-        name,
-        age
+        msg: 'User save success',
+        user
     });
 }
 
-const userPut = (req, res = response) => {
+const userPut = async(req, res = response) => {
     const id = req.params.id;
+    const { _id,  password, google, ...params } = req.body;
+
+    if(password){
+        //Encriptar contraseña
+        const salt = bcryptjs.genSaltSync();
+        params.password = bcryptjs.hashSync(password, salt);
+    }
+
+    const user = await User.findByIdAndUpdate(id, params);
+
     res.json({
-        id,
-        msg: 'Hello World PUT method FROM  COntroler'
+        msg: 'User update success',
+        params
     });
 }
 
@@ -31,9 +80,19 @@ const userPatch = (req, res = response) => {
     });
 }
 
-const userDetele = (req, res = response) => {
+const userDetele = async(req, res = response) => {
+    const id = req.params.id;
+
+    //Eliminación permanente del registro
+    //const user = await User.findByIdAndDelete(id);
+
+    //Eliminación suave del registro
+    const user = await User.findByIdAndUpdate(id, { state:false });
+
     res.json({
-        msg: 'Hello World DELETE method FROM  COntroler'
+        msg: 'Hello World DELETE method FROM  COntroler',
+        id,
+        user
     });
 }
 
