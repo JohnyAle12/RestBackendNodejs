@@ -82,6 +82,8 @@ const userPatch = (req, res = response) => {
 
 const userDetele = async(req, res = response) => {
     const id = req.params.id;
+    const uid = req.uid;
+    const authUser = req.authUser;
 
     //Eliminación permanente del registro
     //const user = await User.findByIdAndDelete(id);
@@ -92,7 +94,9 @@ const userDetele = async(req, res = response) => {
     res.json({
         msg: 'Hello World DELETE method FROM  COntroler',
         id,
-        user
+        uid,
+        user,
+        authUser
     });
 }
 
