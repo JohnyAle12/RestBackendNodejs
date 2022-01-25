@@ -2,7 +2,7 @@ const { Router } = require('express');
 const { check } = require('express-validator');
 
 const {
-    userValidate,
+    fieldsValidate,
     validateJWT,
     isAdminRol,
     hasRole,
@@ -36,21 +36,21 @@ router.post('/', [
     //helper check personalizado
     check('role').custom(validateRole), // (role) => validateRole(role) podemos reemplazarlo por validateRole
     //middleware personalizado
-    userValidate
+    fieldsValidate
 ], userPost);
 
 router.put('/:id', [
     validateJWT,
     isAdminRol,
     check('id', 'No es un id valido').isMongoId().custom(userExistById),
-    userValidate
+    fieldsValidate
 ], userPut);
 
 router.delete('/:id', [
     validateJWT,
     hasRole('customer','user'),
     check('id', 'No es un id valido').isMongoId().custom(userExistById),
-    userValidate
+    fieldsValidate
 ], userDetele);
 
 router.patch('/', userPatch);

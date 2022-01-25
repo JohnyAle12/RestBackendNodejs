@@ -67,10 +67,18 @@ const update = async(req, res = response) => {
     const id = req.params.id;
     const name  = req.body.name.toUpperCase();
 
-    await Category.findByIdAndUpdate(id, {name});
+    const cat = await Category.findOne({ name });
+    if(cat){
+        return res.status(400).json({
+            msg: `La categoria ${ cat.name } ya existe`
+        });
+    }
+    //new:true permite mostrar en la respuesta la categoria actualizada
+    const category = await Category.findByIdAndUpdate(id, { name }, { new:true });
 
     res.json({
-        msg: 'Category update success'
+        msg: 'Category update success',
+        category
     });
 }
 
