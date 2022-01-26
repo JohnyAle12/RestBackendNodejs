@@ -37,6 +37,8 @@ class Server{
     routes(){
         this.app.use(this.pathRoute.auth, require('../routes/auth'));
         this.app.use(this.pathRoute.categories, require('../routes/category'));
+        this.app.use(this.pathRoute.products, require('../routes/product'));
+        this.app.use(this.pathRoute.search, require('../routes/search'));
         this.app.use(this.pathRoute.users, require('../routes/user'));
     }
 

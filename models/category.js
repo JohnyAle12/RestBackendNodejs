@@ -19,8 +19,8 @@ const CategorySchema = Schema({
 });
 
 CategorySchema.methods.toJSON = function(){
-    const { name, created_by } = this.toObject();
-    return { name, created_by };
+    const { _id, name, created_by } = this.toObject();
+    return { _id, name, created_by };
 }
 
 
