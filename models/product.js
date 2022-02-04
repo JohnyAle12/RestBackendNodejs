@@ -25,6 +25,7 @@ const ProductSchema = Schema({
         ref: 'Category',
         required: [true, 'La categoria es obligatorio']
     },
+    image_url: { type: String },
     description: { type: String },
     available: {
         type: Boolean,

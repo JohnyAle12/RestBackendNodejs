@@ -36,7 +36,14 @@ const productExistById = async(id = '') => {
     if(!exist){
         throw new Error('No existe un producto registrado');
     }
+}   
+
+const collectionValidate = async(collection, collections = []) => {
+    if(!collections.includes(collection)){
+        throw new Error('La collección no es permitida');
+    }
+    return true;
 }
 
 
-module.exports = { validateRole, emailExist, userExistById, categoryExistById, productExistById };
+module.exports = { validateRole, emailExist, userExistById, categoryExistById, productExistById, collectionValidate};

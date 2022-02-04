@@ -1,5 +1,6 @@
 
 const express = require('express');
+const fileUpload = require('express-fileupload');
 var cors = require('cors');
 
 const { routes } = require('../config/route');
@@ -32,6 +33,13 @@ class Server{
 
         //exponer directorio publico y tener acceso al html
         this.app.use( express.static('public') );
+
+        // carga de archivos
+        this.app.use(fileUpload({
+            useTempFiles : true,
+            createParentPath: true,
+            tempFileDir : '/tmp/'
+        }));
     }
 
     routes(){
@@ -40,6 +48,7 @@ class Server{
         this.app.use(this.pathRoute.products, require('../routes/product'));
         this.app.use(this.pathRoute.search, require('../routes/search'));
         this.app.use(this.pathRoute.users, require('../routes/user'));
+        this.app.use(this.pathRoute.uploads, require('../routes/uploads'));
     }
 
     listen(){

@@ -3,7 +3,8 @@ const routes = {
     categories: '/api/categories',
     products: '/api/products',
     search: '/api/search',
-    users: '/api/users'
+    users: '/api/users',
+    uploads: '/api/uploads'
 }
 
 
