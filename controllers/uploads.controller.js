@@ -76,4 +76,46 @@ const updateImage = async(req, res = response) => {
     }
 }
 
-module.exports = { saveFile, updateImage }
+const showImage = async(req, res = response) => {
+    const { collection, id } = req.params;
+
+    let model;
+
+    switch (collection) {
+        case 'users':
+            model = await User.findById(id);
+            if(!model){
+                return res.status(400).json({
+                    msg: 'No existe un usuario registrado',
+                    id
+                })
+            }
+        break;
+        case 'products':
+            model = await Product.findById(id);
+            if(!model){
+                return res.status(400).json({
+                    msg: 'No existe un producto registrado'
+                })
+            }
+        break;
+    
+        default:
+            return res.status(500).json({
+                msg: 'no esta implementada esta colleccion'
+            });
+    }
+
+    //Validacion de imagen si existe en el filesystem
+    if ( model.image_url ) {
+        const imagePath = path.join( __dirname, '../storage', collection, model.image_url);
+        if( fs.existsSync(imagePath) ){
+            return res.sendFile(imagePath);
+        }
+    }
+
+    const noImagePath = path.join( __dirname, '../public/assets', 'no-image.jpeg');
+    res.sendFile(noImagePath);
+}
+
+module.exports = { saveFile, updateImage, showImage }
