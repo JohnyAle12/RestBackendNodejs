@@ -3,14 +3,14 @@ const { response } = require('express');
 const path = require('path');
 const fs = require('fs');
 
-const { uploadFiles } = require('../helpers');
+const { uploadFilesToLocal, uploadFilesToCloudinary } = require('../helpers');
 const Product = require('../models/product');
 const User = require('../models/user');
 
 const saveFile = async (req, res = response) => {
 
     try {
-        const result = await uploadFiles(req.files, ['jpg', 'png'], 'others');
+        const result = await uploadFilesToLocal(req.files, ['jpg', 'png'], 'others');
         res.json({
             result
         });
@@ -52,18 +52,9 @@ const updateImage = async(req, res = response) => {
             });
     }
 
-    //Limpieza de imagen si existe en el filesystem
-    if ( model.image_url ) {
-        const imagePath = path.join( __dirname, '../storage', collection, model.image_url);
-        if( fs.existsSync(imagePath) ){
-            fs.unlinkSync(imagePath);
-        }
-    }
-
     try {
-        const nameImage = await uploadFiles(req.files, ['jpg', 'png'], collection);
-        model.image_url = nameImage
-
+        const secure_url = await uploadFilesToCloudinary(req.files, ['jpg', 'png'], model.image_url);
+        model.image_url = secure_url;
         await model.save();
 
         res.json({
@@ -104,6 +95,13 @@ const showImage = async(req, res = response) => {
             return res.status(500).json({
                 msg: 'no esta implementada esta colleccion'
             });
+    }
+    
+    //Validacion de imagen es de un servicio externo
+    if ( model.image_url.includes("http://") || model.image_url.includes('https://') ) {
+        return res.json({
+            url: model.image_url
+        });
     }
 
     //Validacion de imagen si existe en el filesystem
